@@ -32,7 +32,8 @@ namespace Layers {
             weights_momentums(n_inputs * n_neurons), weights_cache(n_inputs * n_neurons),
             biases_momentums(n_neurons), biases_cache(n_neurons) {}
 
-            void forward(vector<float> inputs) {
+            void forward(vector<float>& inputs) {
+                this -> inputs = inputs;
                 float sum;
                 for (int i = 0; i < n_regs; i++) {
                     for (int j = 0; j < n_neurons; j++) {
@@ -45,7 +46,7 @@ namespace Layers {
                 }
             }
 
-            void backward(vector<float> grad) {
+            void backward(vector<float>& grad) {
                 float sum;
                 for (int i = 0; i < n_inputs; i++) {
                     for (int j = 0; j < n_neurons; j++) {
@@ -56,6 +57,24 @@ namespace Layers {
                         dW[i * n_neurons + j] = sum;
                     }
                 }
+
+                for (int i = 0; i < n_regs; i++) {
+                    for (int j = 0; j < n_inputs; j++) {
+                        sum = 0;
+                        for (int k = 0; k < n_neurons; k++) {
+                            sum += grad[i * n_neurons + k] * weights[j * n_neurons + k];
+                        }
+                        dX[i * n_inputs + j] = sum;
+                    }
+                }
+
+                for (int i = 0; i < n_neurons; i++) {
+                    sum = 0;
+                    for (int j = 0; j < n_regs; j++) {
+                        sum += grad[j * n_neurons + i];
+                    }
+                    dB[i] = sum;
+                }   
             }
     };
 }
